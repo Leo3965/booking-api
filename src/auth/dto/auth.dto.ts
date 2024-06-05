@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 
 export class AuthDTO {
   @IsEmail()
@@ -8,4 +8,11 @@ export class AuthDTO {
   @IsString()
   @IsNotEmpty()
   password: string
+}
+
+export class Token {
+  access_token: string
+  constructor(token: string) {
+    this.access_token = token
+  }
 }
