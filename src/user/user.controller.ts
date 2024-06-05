@@ -1,7 +1,13 @@
-import { Controller, Get, UseGuards } from '@nestjs/common'
-import { GetUser } from 'src/auth/decorator'
-import { JWTGuard } from 'src/auth/guard'
-import { APIToken } from 'src/auth/model/api-token.model'
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common'
+import { GetUser } from '../auth/decorator'
+import { JWTGuard } from '../auth/guard'
+import { APIToken } from '../auth/model/api-token.model'
 
 @Controller('users')
 export class UserController {
@@ -9,7 +15,8 @@ export class UserController {
 
   @UseGuards(JWTGuard)
   @Get('me')
-  getMe(@GetUser() user: APIToken) : APIToken {
+  @HttpCode(HttpStatus.OK)
+  getMe(@GetUser() user: APIToken): APIToken {
     return user
   }
 }
