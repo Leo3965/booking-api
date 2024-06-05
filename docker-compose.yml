@@ -16,3 +16,16 @@ services:
       POSTGRES_PASSWORD: 123
     networks:
       - leonet
+
+  test-db:
+    container_name: 'posgres-test-db'
+    image: postgres:13
+    ports:
+      # local : container
+      - 5435:5432
+    environment:
+      POSTGRES_DB: nest
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    networks:
+      - leonet
