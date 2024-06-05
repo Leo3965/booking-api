@@ -1,13 +1,10 @@
 import { Test } from '@nestjs/testing'
 import { AppModule } from '../src/app.module'
-import {
-  HttpStatus,
-  INestApplication,
-  ValidationPipe,
-} from '@nestjs/common'
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common'
 import { PrismaService } from '../src/prisma/prisma.service'
 import * as pactum from 'pactum'
 import { AuthDTO } from 'src/auth/dto'
+import { EditUserDTO } from 'src/user/dto/edit-user.dto'
 
 let app: INestApplication
 let prisma: PrismaService
@@ -16,23 +13,18 @@ const PORT = '3333'
 
 describe('AppController (e2e)', () => {
   beforeAll(async () => {
-    const moduleRef =
-      await Test.createTestingModule({
-        imports: [AppModule],
-      }).compile()
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
 
     app = moduleRef.createNestApplication()
-    app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true }),
-    )
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
     await app.init()
     await app.listen(3333)
 
     prisma = app.get(PrismaService)
     await prisma.cleanDb()
-    pactum.request.setBaseUrl(
-      `http://localhost:${PORT}/`,
-    )
+    pactum.request.setBaseUrl(`http://localhost:${PORT}/`)
   })
 
   afterAll(() => {
@@ -120,12 +112,24 @@ describe('AppController (e2e)', () => {
         return pactum
           .spec()
           .get('users/me')
-          .withHeaders({Authorization: `Bearer $S{userAt}`})
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
           .expectStatus(HttpStatus.OK)
-          .inspect()
       })
     })
-    describe('Edit User', () => {})
+
+    describe('Edit User', () => {
+      const dto: EditUserDTO = { firstName: 'edit name', email: 'edit-email@email.com' }
+      it('Should edit user', () => {
+        return pactum
+          .spec()
+          .patch('users')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withBody(dto)
+          .expectStatus(HttpStatus.OK)
+          .expectBodyContains(dto.firstName)
+          .expectBodyContains(dto.email)
+      })
+    })
   })
 
   describe('Bookmarks', () => {
